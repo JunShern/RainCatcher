@@ -2,16 +2,23 @@
 var particles = []; 
 var numParticles = 50;
 var catchSize = 20;
-var prevMouseX = 0;
-var prevMouseY = 0;
+var prevMouseX;
+var prevMouseY;
+var state = 0;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
+    prevMouseX = width/2;
+    prevMouseY = height/2;
 
     for (var i=0; i<numParticles; i++) {
     	particles.push(new Particle(i));
     }
     indexCount = numParticles;
+
+    // Font setup
+    titleFont = "Georgia";
+    //titleFont = loadFont("assets/fonts/ArimaMadurai-Regular.ttf");
 }
 
 function draw() {
@@ -29,7 +36,47 @@ function draw() {
     	}
     }
 
-    fill(100,255,255);
+
+    /* State handling
+	State 0 - Welcome screen
+	State 1 - Playing game
+	State 2 - Paused
+	*/
+	if (state == 0) {
+		introScreen();
+	} else {
+		runGame();
+	}
+}
+
+function paused() {
+	drawTitle();
+}
+
+function runGame() {
+	drawCursor();
+}
+
+function drawTitle() {
+	fill(255);
+	textAlign(CENTER);
+	textSize(56);
+	textFont(titleFont);
+	text("RainCatcher", width/2, height/2);
+}
+
+function introScreen() {
+	drawTitle();
+	textSize(16);
+	textFont("Georgia");
+	text("Use the cursor to catch raindrops.\nPress any key to begin.", width/2, height/2+50);
+	if (keyIsPressed === true) {
+		state = 1;
+	}
+}
+
+function drawCursor() {
+	fill(100,255,255);
     strokeWeight(2);
     stroke(100,255,255)
     line(mouseX, mouseY, prevMouseX, prevMouseY);
