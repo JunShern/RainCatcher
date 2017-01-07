@@ -7,6 +7,7 @@ var prevMouseY;
 var state = 0;
 var score = 0;
 var waterLevel = 0;
+var waterThreshold = 100;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -25,11 +26,13 @@ function setup() {
 
 function draw() {
     background(0,40);
+    drawThreshold();
     drawWater();
     /* State handling
 	State 0 - Welcome screen
 	State 1 - Playing game
 	State 2 - Paused
+	State 3 - Game Over
 	*/
 	if (state == 0) {
 		introScreen();
@@ -39,13 +42,33 @@ function draw() {
 		handleParticles();
 	} else if (state == 2) {
 		paused();
+	} else if (state == 3) {
+		gameOver();
+	} 
+}
+
+function drawThreshold() {
+	stroke(200,100,30);
+	strokeWeight(20);
+	line(width/2, height-waterThreshold, width/2, height);
+	noStroke();
+}
+
+function gameOver() {
+	cursor(); // In-built function to show standard cursor
+	displayScore();
+	textSize(16);
+	textFont("Verdana");
+	text("Game over!\nRefresh page to play again.", width/2, height/2+50);
+	if (keyIsDown(ENTER) === true) {
+		state = 1;
 	}
 }
 
 function drawWater() {
 	// Draw water level	
 	colorMode(HSB,100);
-	fill(50, 50, 40); //random(200,255), random(150,200), random(0,50));
+	fill(50, 50, 40, 50); //random(200,255), random(150,200), random(0,50));
 	colorMode(RGB,255);
 	rect(0, height-waterLevel, width, waterLevel);
 }
@@ -114,7 +137,7 @@ function drawCursor() {
 	noCursor(); // In-built function to hide cursor
 	fill(100,255,255);
     strokeWeight(2);
-    stroke(100,255,255)
+    stroke(100,255,255);
     line(mouseX, mouseY, prevMouseX, prevMouseY);
     noStroke();
     ellipse(mouseX, mouseY, catchSize/4, catchSize/4);
@@ -155,7 +178,12 @@ function Particle(index) {
 	this.melt = function() {
 		if (this.y >= height-this.diameter/2-waterLevel && random(100)>90) {
 			this.diameter = this.diameter-1;
-			if (state === 1) waterLevel = waterLevel+0.1;
+			if (state === 1) {
+				waterLevel = waterLevel+0.1;
+				if (waterLevel > waterThreshold) {
+					state = 3;
+				}
+			}
 			if (this.diameter <= 0) {
 				// Reset particle
 				particles[this.index] = new Particle(this.index);
