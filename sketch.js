@@ -1,6 +1,9 @@
 
 var particles = []; 
 var numParticles = 50;
+var catchSize = 20;
+var prevMouseX = 0;
+var prevMouseY = 0;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -21,9 +24,19 @@ function draw() {
     	} else {
     		particles[i].display();
 	    	particles[i].fall();
+	    	particles[i].checkMouse();
 	    	particles[i].melt();
     	}
     }
+
+    fill(100,255,255);
+    strokeWeight(2);
+    stroke(100,255,255)
+    line(mouseX, mouseY, prevMouseX, prevMouseY);
+    noStroke();
+    ellipse(mouseX, mouseY, catchSize/2, catchSize/2);
+    prevMouseX = mouseX;
+    prevMouseY = mouseY;
 }
 
 function Particle(index) {
@@ -45,22 +58,21 @@ function Particle(index) {
 		this.y = constrain(this.y+2, -2*height, height-this.diameter/2);
 	}
 
-	this.melt = function() {
-		// if (this.y == height-this.diameter/2 && random(100)>90) {
-		// 	this.diameter = this.diameter-1;
-		// }
-
-		var catchSize = 20;
+	this.checkMouse = function() {
 		if (abs(this.y-mouseY)<catchSize && abs(this.x-mouseX)<catchSize) {
 			this.explode();
 			this.hasChildren = true;
-		} else if (this.y == height-this.diameter/2) {
-			this.explode();
-			this.hasChildren = true;
-			// Reset particle
-			//particles[this.index] = new Particle(this.index);
-		}
+		} 
+	}
 
+	this.melt = function() {
+		if (this.y >= height-this.diameter/2 && random(100)>90) {
+			this.diameter = this.diameter-1;
+			if (this.diameter <= 0) {
+				// Reset particle
+				particles[this.index] = new Particle(this.index);
+			}
+		}
 	}
 
 	this.explode = function() {
