@@ -5,6 +5,7 @@ var catchSize = 20;
 var prevMouseX;
 var prevMouseY;
 var state = 0;
+var score = 0;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -24,7 +25,24 @@ function setup() {
 function draw() {
     background(0,40);
 
-    noStroke();
+    /* State handling
+	State 0 - Welcome screen
+	State 1 - Playing game
+	State 2 - Paused
+	*/
+	if (state == 0) {
+		introScreen();
+		handleParticles();
+	} else if (state == 1) {
+		runGame();
+		handleParticles();
+	} else if (state == 2) {
+		paused();
+	}
+}
+
+function handleParticles() {
+	noStroke();
     for (var i=0; i<numParticles; i++) {
     	if (particles[i].hasChildren) {
     		particles[i].handleChildren();
@@ -35,29 +53,37 @@ function draw() {
 	    	particles[i].melt();
     	}
     }
+}
 
-
-    /* State handling
-	State 0 - Welcome screen
-	State 1 - Playing game
-	State 2 - Paused
-	*/
-	if (state == 0) {
-		introScreen();
-	} else {
-		runGame();
-	}
+function displayScore() {
+	fill(255);
+	textAlign(CENTER);
+	textSize(100);
+	textFont("Arial");
+	text(score, width/2, height/2);
 }
 
 function paused() {
-	drawTitle();
+	cursor(); // In-built function to show standard cursor
+	displayScore();
+	textSize(16);
+	textFont("Verdana");
+	text("Game paused.\nPress ENTER to resume.", width/2, height/2+50);
+	if (keyIsDown(ENTER) === true) {
+		state = 1;
+	}
 }
 
 function runGame() {
 	drawCursor();
+	displayScore();
+	if (keyIsDown(32) === true) {
+		state = 2;
+	}
 }
 
 function drawTitle() {
+	cursor(); // In-built function to show standard cursor
 	fill(255);
 	textAlign(CENTER);
 	textSize(56);
@@ -68,20 +94,21 @@ function drawTitle() {
 function introScreen() {
 	drawTitle();
 	textSize(16);
-	textFont("Georgia");
-	text("Use the cursor to catch raindrops.\nPress any key to begin.", width/2, height/2+50);
-	if (keyIsPressed === true) {
+	textFont("Verdana");
+	text("Use the cursor to catch raindrops.\nPress ENTER to begin.", width/2, height/2+50);
+	if (keyIsDown(ENTER) === true) {
 		state = 1;
 	}
 }
 
 function drawCursor() {
+	noCursor(); // In-built function to hide cursor
 	fill(100,255,255);
     strokeWeight(2);
     stroke(100,255,255)
     line(mouseX, mouseY, prevMouseX, prevMouseY);
     noStroke();
-    ellipse(mouseX, mouseY, catchSize/2, catchSize/2);
+    ellipse(mouseX, mouseY, catchSize/4, catchSize/4);
     prevMouseX = mouseX;
     prevMouseY = mouseY;
 }
@@ -91,7 +118,11 @@ function Particle(index) {
 	this.y = random(2*height)-2*height;
 	this.index = index;
 	this.diameter = random(2, 10);
-	this.c = random(150,255);
+	
+	colorMode(HSB,100);
+	this.c = color(random(50,60), 50, 90); //random(200,255), random(150,200), random(0,50));
+	colorMode(RGB,255);
+
 	this.children = [];
 	this.hasChildren = false;
 	this.numChildren = this.diameter;
@@ -125,6 +156,7 @@ function Particle(index) {
 	this.explode = function() {
 		console.log("A FireChild is born!");
 		for (var i=0; i<this.numChildren; i++) {
+			if (state === 1) score = score + 1;
 			this.children[i] = new FireChild(i, this.x, this.y);
 		}
 	}
@@ -157,7 +189,7 @@ function FireChild(index, xpos, ypos) {
 	this.velX = random(-5,5);
 	this.velY = random(0,-5);
 	this.diameter = random(1,2);
-	this.c = 255; //color(random(200,255), random(150,200), random(0,50));
+	this.c = 255; //random(200,255), random(150,200), random(0,50));
 
 	this.display = function() {
 		fill(this.c);
