@@ -61,6 +61,7 @@ function draw() {
 	} 
 
 	frameCounter++;
+	//drawMoon();
 }
 
 function playNote(note, duration) {
@@ -92,6 +93,32 @@ function gameOver() {
 	if (keyIsDown(ENTER) === true) {
 		state = 1;
 	}
+}
+
+function drawMoon() {
+	colorMode(HSB,100);
+	c = color(random(15,25), 30, random(80,100)); //random(200,255), random(150,200), random(0,50));
+	stroke(c);
+	colorMode(RGB,255);
+	strokeWeight(1);
+	noFill();
+
+	var jitter = 10;
+	var vertices = 10;
+	var radius = 50;
+	var centerX = width*2/3;
+	var centerY = height/3;
+	beginShape();
+	var startAngle = random(TWO_PI);
+	for (var i=0; i<vertices; i++) {
+		var radians = i*TWO_PI / float(vertices);
+		var x = centerX + radius*cos(startAngle+radians) + random(-jitter, jitter);
+		var y = centerY + radius*sin(startAngle+radians) + random(-jitter, jitter);
+		vertex(x,y);
+	}
+	endShape(CLOSE);
+
+	noStroke();
 }
 
 function drawWater() {
