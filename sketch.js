@@ -6,6 +6,7 @@ var prevMouseX;
 var prevMouseY;
 var state = 0;
 var score = 0;
+var waterLevel = 0;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -24,7 +25,7 @@ function setup() {
 
 function draw() {
     background(0,40);
-
+    drawWater();
     /* State handling
 	State 0 - Welcome screen
 	State 1 - Playing game
@@ -39,6 +40,14 @@ function draw() {
 	} else if (state == 2) {
 		paused();
 	}
+}
+
+function drawWater() {
+	// Draw water level	
+	colorMode(HSB,100);
+	fill(50, 50, 40); //random(200,255), random(150,200), random(0,50));
+	colorMode(RGB,255);
+	rect(0, height-waterLevel, width, waterLevel);
 }
 
 function handleParticles() {
@@ -120,7 +129,7 @@ function Particle(index) {
 	this.diameter = random(2, 10);
 	
 	colorMode(HSB,100);
-	this.c = color(random(50,60), 50, 90); //random(200,255), random(150,200), random(0,50));
+	this.c = color(random(50,60), 50, random(80,100)); //random(200,255), random(150,200), random(0,50));
 	colorMode(RGB,255);
 
 	this.children = [];
@@ -133,7 +142,7 @@ function Particle(index) {
 	}
 
 	this.fall = function() {
-		this.y = constrain(this.y+2, -2*height, height-this.diameter/2);
+		this.y = constrain(this.y+2, -2*height, height-waterLevel);
 	}
 
 	this.checkMouse = function() {
@@ -144,8 +153,9 @@ function Particle(index) {
 	}
 
 	this.melt = function() {
-		if (this.y >= height-this.diameter/2 && random(100)>90) {
+		if (this.y >= height-this.diameter/2-waterLevel && random(100)>90) {
 			this.diameter = this.diameter-1;
+			if (state === 1) waterLevel = waterLevel+0.1;
 			if (this.diameter <= 0) {
 				// Reset particle
 				particles[this.index] = new Particle(this.index);
