@@ -1,6 +1,6 @@
 
 var particles = []; 
-var numParticles = 20;
+var numParticles = 50;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -12,9 +12,8 @@ function setup() {
 }
 
 function draw() {
-    background(0,50);
+    background(0,40);
 
-    fill(255);
     noStroke();
     for (var i=0; i<numParticles; i++) {
     	particles[i].display();
@@ -25,16 +24,20 @@ function draw() {
 
 function Particle(index) {
 	this.x = random(width);
-	this.y = random(height)-height;
+	this.y = random(2*height)-2*height;
 	this.index = index;
-	this.diameter = random(10, 30);
+	this.diameter = random(2, 10);
+	this.c = random(150,255);
+	this.children = [];
+	this.numChildren = 5;
 
 	this.display = function() {
+		fill(this.c);
 		ellipse(this.x, this.y, this.diameter, this.diameter);
 	}
 
 	this.fall = function() {
-		this.y = constrain(this.y+1, -height, height-this.diameter/2);
+		this.y = constrain(this.y+1, -2*height, height-this.diameter/2);
 	}
 
 	this.melt = function() {
@@ -46,6 +49,13 @@ function Particle(index) {
 			particles[this.index] = new Particle(this.index);
 		}
 	}
+
+	this.explode = function() {
+		for (var i=0; i<this.numChildren; i++) {
+			this.children[i] = new Particle(i);
+		}
+	}
+
 }
 
 
