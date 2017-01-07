@@ -6,6 +6,9 @@ var prevMouseX;
 var prevMouseY;
 var state = 0;
 
+var islands = [];
+var numIslands = 3;
+
 var score = 0;
 var scoreBrightness = 255;
 
@@ -27,8 +30,14 @@ function setup() {
     }
     indexCount = numParticles;
 
-    // Font setup
+    // Island setup
+    for (var i=0; i<numIslands; i++) {
+    	var radius = int(random(50,200));
+    	islands[i] = new Island(radius);
+    	islands[i].create();
+    }
 
+    // Font setup
     titleFont = "Georgia";
     //titleFont = loadFont("assets/fonts/ArimaMadurai-Regular.ttf");
 
@@ -41,6 +50,9 @@ function setup() {
 function draw() {
     background(0,40);
     //drawThreshold();
+    for (var i=0; i<numIslands; i++) {
+    	islands[i].display();
+    }
     drawWater();
     /* State handling
 	State 0 - Welcome screen
@@ -95,9 +107,54 @@ function gameOver() {
 	}
 }
 
+function Island(radius) {
+	this.numVertices = 20;
+	this.verticesX = [];
+	this.verticesY = [];
+	this.jitter = radius/2;
+	this.radius = radius;
+	this.centerX = random(width);
+	this.centerY = height;
+	this.colors = [];
+
+	this.create = function() {
+		var startAngle = random(TWO_PI);
+		for (var i=0; i<this.numVertices; i++) {
+			var radians = i*TWO_PI / float(this.numVertices);
+			var x = this.centerX + (this.radius*cos(startAngle+radians)) / 2;
+			var y = this.centerY + this.radius*sin(startAngle+radians) + random(-this.jitter, this.jitter);
+			this.verticesX[i] = x;
+			this.verticesY[i] = y;
+
+			colorMode(HSB,100);
+			this.colors[i] = color(random(3,10), random(50,90), random(20,60), 30); 
+			colorMode(RGB,255);
+		}
+	}
+
+	this.display = function() {
+		//noFill();
+		beginShape();
+		for (var i=0; i<this.numVertices; i++) {
+			vertex(this.verticesX[i],this.verticesY[i]);
+
+			fill(this.colors[i]);
+			var x1 = this.verticesX[i];
+			var y1 = this.verticesY[i];
+			var x2 = this.verticesX[(i+3)%this.numVertices];
+			var y2 = this.verticesY[(i+3)%this.numVertices];
+			var x3 = this.verticesX[(i+6)%this.numVertices];
+			var y3 = this.verticesY[(i+6)%this.numVertices];
+			triangle(x1,y1,x2,y2,x3,y3);
+		}
+		endShape(CLOSE);
+		noStroke();
+	}
+}
+
 function drawMoon() {
 	colorMode(HSB,100);
-	c = color(random(15,25), 30, random(80,100)); //random(200,255), random(150,200), random(0,50));
+	c = color(random(15,25), 30, random(80,100)); 
 	stroke(c);
 	colorMode(RGB,255);
 	strokeWeight(1);
