@@ -5,9 +5,17 @@ var catchSize = 20;
 var prevMouseX;
 var prevMouseY;
 var state = 0;
+
 var score = 0;
-var waterLevel = 0;
-var waterThreshold = 100;
+var scoreBrightness = 255;
+
+var waterLevel = 10;
+var waterThreshold = 200;
+var frameCounter = 0;
+
+var pentatonicScale = [0, 2, 4, 7, 9, 12];
+var octave = 6;
+var osc;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -20,13 +28,19 @@ function setup() {
     indexCount = numParticles;
 
     // Font setup
+
     titleFont = "Georgia";
     //titleFont = loadFont("assets/fonts/ArimaMadurai-Regular.ttf");
+
+    // Triangle oscillator
+    osc = new p5.TriOsc();
+    osc.start();
+    osc.amp(0);
 }
 
 function draw() {
     background(0,40);
-    drawThreshold();
+    //drawThreshold();
     drawWater();
     /* State handling
 	State 0 - Welcome screen
@@ -45,11 +59,26 @@ function draw() {
 	} else if (state == 3) {
 		gameOver();
 	} 
+
+	frameCounter++;
+}
+
+function playNote(note, duration) {
+  osc.freq(midiToFreq(note));
+  // Fade it in
+  osc.fade(0.5,0.2);
+
+  // If we sest a duration, fade it out
+  if (duration) {
+    setTimeout(function() {
+      osc.fade(0,0.2);
+    }, duration-50);
+  }
 }
 
 function drawThreshold() {
 	stroke(200,100,30);
-	strokeWeight(20);
+	strokeWeight(2);
 	line(width/2, height-waterThreshold, width/2, height);
 	noStroke();
 }
@@ -66,11 +95,27 @@ function gameOver() {
 }
 
 function drawWater() {
-	// Draw water level	
-	colorMode(HSB,100);
-	fill(50, 50, 40, 50); //random(200,255), random(150,200), random(0,50));
-	colorMode(RGB,255);
-	rect(0, height-waterLevel, width, waterLevel);
+	var lineGap = 15;
+	var waveHeight = 30;
+	for (var i=0; i*lineGap<height; i++) {
+		var frameOsc = cos(frameCounter*TWO_PI/200.0);
+		var lineOsc = sin(i*TWO_PI/25.0);
+
+		// Draw water level	
+		colorMode(HSB,100);
+		strokeWeight(1);
+		stroke(50 + lineOsc*10 - frameOsc*10, 70, 80, 50); //random(200,255), random(150,200), random(0,50));
+		colorMode(RGB,255);
+		var numJoints = random(5,20);
+		for (var j=0; j<numJoints; j++) {
+			var x1 = j*width/numJoints;
+			var y1 = height-waterLevel+(i*lineGap) + (j%2)*10;
+			var x2 = (j+1)*width/numJoints;
+			var y2 = height-waterLevel+(i*lineGap) + ((j+1)%2)*5;
+			line(x1, y1, x2, y2);
+		}
+		noStroke();
+	}
 }
 
 function handleParticles() {
@@ -82,15 +127,17 @@ function handleParticles() {
     		particles[i].display();
 	    	particles[i].fall();
 	    	particles[i].checkMouse();
-	    	particles[i].melt();
+	    	//particles[i].melt();
     	}
     }
 }
 
 function displayScore() {
-	fill(255);
+	scoreBrightness = constrain(scoreBrightness-1, 230, 255);
+	fill(scoreBrightness,100);
+
 	textAlign(CENTER);
-	textSize(100);
+	textSize(scoreBrightness*100/255);
 	textFont("Arial");
 	text(score, width/2, height/2);
 }
@@ -98,6 +145,10 @@ function displayScore() {
 function paused() {
 	cursor(); // In-built function to show standard cursor
 	displayScore();
+	for (var i=0; i<numParticles; i++) {
+		particles[i].display();
+	}
+	fill(255);
 	textSize(16);
 	textFont("Verdana");
 	text("Game paused.\nPress ENTER to resume.", width/2, height/2+50);
@@ -165,18 +216,16 @@ function Particle(index) {
 	}
 
 	this.fall = function() {
-		this.y = constrain(this.y+2, -2*height, height-waterLevel);
-	}
-
-	this.checkMouse = function() {
-		if (abs(this.y-mouseY)<catchSize && abs(this.x-mouseX)<catchSize) {
-			this.explode();
-			this.hasChildren = true;
-		} 
+		if (this.y >= height-this.diameter/2-waterLevel) {
+			this.melt();
+		} else {
+			this.y = constrain(this.y+2, -2*height, height-waterLevel);
+		}
 	}
 
 	this.melt = function() {
-		if (this.y >= height-this.diameter/2-waterLevel && random(100)>90) {
+		if (random(100)>60) this.y = this.y + 1;
+		if (random(100)>90) {
 			this.diameter = this.diameter-1;
 			if (state === 1) {
 				waterLevel = waterLevel+0.1;
@@ -191,10 +240,22 @@ function Particle(index) {
 		}
 	}
 
+	this.checkMouse = function() {
+		if (abs(this.y-mouseY)<catchSize && abs(this.x-mouseX)<catchSize) {
+			this.explode();
+			this.hasChildren = true;
+		} 
+	}
+
 	this.explode = function() {
-		console.log("A FireChild is born!");
+		note = 12*octave + pentatonicScale[int(random(0,pentatonicScale.length))];
+		//playNote(note, 300);
+		//console.log("A FireChild is born!");
 		for (var i=0; i<this.numChildren; i++) {
-			if (state === 1) score = score + 1;
+			if (state === 1) { 
+				score = score + 1;
+				scoreBrightness = constrain(scoreBrightness+10, 200, 255);
+			}
 			this.children[i] = new FireChild(i, this.x, this.y);
 		}
 	}
