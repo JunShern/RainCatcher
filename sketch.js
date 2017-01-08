@@ -1,7 +1,7 @@
 
 var particles = []; 
 var numParticles = 50;
-var catchSize = 5;
+var catchSize = 10;
 var state = 0;
 
 var islands = [];
@@ -54,10 +54,12 @@ function setup() {
     //osc = new p5.TriOsc();
     //osc.start();
     //osc.amp(0);
+
+    frameRate(20);
 }
 
 function draw() {
-    background(0,40);
+    background(0,70);
 
     for (var i=0; i<numIslands; i++) {
     	islands[i].display();
@@ -78,7 +80,7 @@ function draw() {
 	} else if (state == 1) {
 		runGame();
 		handleParticles();
-		if (frameCounter % 15 === 0) starPower++;
+		if (frameCounter % 15 === 0) starPower += 2;
 	} else if (state == 2) {
 		paused();
 	} else if (state == 3) {
@@ -366,7 +368,7 @@ function drawCursor() {
     // Draw sun
     drawSun(mouseX, mouseY, catchSize);
 	
-	catchSize = constrain(catchSize-5, 5, 500);
+	catchSize = constrain(catchSize-5, 10, 500);
 }
 
 function touchMoved() {
@@ -389,12 +391,12 @@ function touchMoved() {
     // Draw sun
     drawSun(mouseX, mouseY, catchSize);
 	
-	catchSize = constrain(catchSize-5, 5, 500);	
+	catchSize = constrain(catchSize-5, 10, 500);	
 }
 
 function mouseClicked() {
 	state = 1;
-	ellipse(mouseX, mouseY, 5, 5);
+	//ellipse(mouseX, mouseY, 5, 5);
 	catchSize = catchSize + starPower;
 	starPower = 0;
 	// prevent default
@@ -403,7 +405,7 @@ function mouseClicked() {
 
 function touchStarted() {
 	state = 1;
-	ellipse(mouseX, mouseY, 5, 5);
+	//ellipse(mouseX, mouseY, 5, 5);
 	catchSize = catchSize + starPower;
 	starPower = 0;
 	// prevent default
@@ -433,7 +435,7 @@ function Particle(index) {
 		if (this.y >= height-this.diameter/2-waterLevel) {
 			this.melt();
 		} else {
-			this.y = constrain(this.y+2, -2*height, height-waterLevel);
+			this.y = constrain(this.y+7, -2*height, height-waterLevel);
 		}
 	}
 
