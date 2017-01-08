@@ -1,5 +1,5 @@
 # RainCatcher
-RainCatcher is a browser game made using p5.js. Try it out here!
+RainCatcher is a browser game made using p5.js. Try it out [here](https://junshern.github.io/RainCatcher/)!
 
 ### Gameplay
 You are the sorcerer and chief of your island village. The Gods are angry at your village because your last harvest did not yield enough offerings for the Gods. As punishment, the Gods have condemned your entire village to death by flood.
@@ -8,4 +8,6 @@ You have magic, which you can use in various ways to slow the effects of the rai
 
 You are but a sorcerer, and They are Gods. It appears that despite your best efforts, resistance is futile. 
 
-Or is it?
+*Or is it?*
+
+![RainCatcher screenshot](https://raw.githubusercontent.com/JunShern/RainCatcher/master/assets/img/screenshot.png 'RainCatcher screenshot')
