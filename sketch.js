@@ -374,7 +374,7 @@ function runGame() {
 function drawTitle() {
 	cursor(); // In-built function to show standard cursor
 	fill(255);
-	textAlign(CENTER);
+	textAlign(CENTER, CENTER);
 	textSize(100);
 	textFont(titleFont);
 	text("RainCatcher", width/2, height/2);
