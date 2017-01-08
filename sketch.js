@@ -343,7 +343,7 @@ function introScreen() {
 	drawTitle();
 	textSize(16);
 	textFont(titleFont);
-	text("Use the cursor to catch raindrops.\nPress ENTER to begin.", width/2, height/2+50);
+	text("Use the cursor to catch raindrops.\nTap / Press ENTER to begin.", width/2, height/2+50);
 	if (keyIsDown(ENTER) === true) {
 		state = 1;
 	}
