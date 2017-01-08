@@ -341,10 +341,10 @@ function displayScore() {
 	scoreBrightness = constrain(scoreBrightness-1, 230, 255);
 	fill(scoreBrightness,100);
 
-	textAlign(LEFT);
-	textSize(scoreBrightness*100/255);
+	textAlign(LEFT, TOP);
+	textSize(scoreBrightness*60/255);
 	textFont(titleFont);
-	text(score, 40, height/2);
+	text(score, 30, 20);
 }
 
 function paused() {
