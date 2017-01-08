@@ -316,7 +316,7 @@ function paused() {
 	fill(255);
 	textSize(16);
 	textFont(titleFont);
-	text("Game paused.\nPress ENTER to resume.", width/2, height/2+50);
+	text("Game paused.\nTap / Press ENTER to resume.", width/2, height/2+50);
 	if (keyIsDown(ENTER) === true) {
 		state = 1;
 	}
@@ -377,6 +377,7 @@ function drawCursor() {
 }
 
 function mouseClicked() {
+	state = 1;
 	ellipse(mouseX, mouseY, 5, 5);
 	catchSize = catchSize + starPower;
 	starPower = 0;
