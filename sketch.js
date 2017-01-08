@@ -157,9 +157,10 @@ function drawThreshold() {
 function gameOver() {
 	cursor(); // In-built function to show standard cursor
 	displayScore();
-	textSize(16);
+	drawTitle();
+	textSize(26);
 	textFont(titleFont);
-	text("Game over!\nRefresh page to play again.", width/2, height/2+50);
+	text("Game over!\nRefresh page to play again.", width/2, height/2+100);
 	if (keyIsDown(ENTER) === true) {
 		state = 1;
 	}
@@ -504,7 +505,7 @@ function Particle(index) {
 		if (random(100)>90) {
 			this.diameter = this.diameter-1;
 			if (state === 1) {
-				waterLevel = waterLevel+0.2;
+				waterLevel = waterLevel+0.3;
 				if (waterLevel > waterThreshold) {
 					state = 3;
 				}
@@ -565,7 +566,7 @@ function FireChild(index, xpos, ypos) {
 	this.velX = random(-8,8);
 	this.velY = random(-5,5);
 	this.diameter = random(1,2);
-	this.c = 255; //random(200,255), random(150,200), random(0,50));
+	this.c = 255; 
 
 	this.display = function() {
 		if (random(100) > 50) {
