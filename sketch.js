@@ -1,13 +1,15 @@
 
 var particles = []; 
 var numParticles = 50;
-var catchSize = 20;
+var catchSize = 5;
 var prevMouseX;
 var prevMouseY;
 var state = 0;
 
 var islands = [];
 var numIslands = 3;
+
+var moon;
 
 var score = 0;
 var scoreBrightness = 255;
@@ -19,6 +21,11 @@ var frameCounter = 0;
 var pentatonicScale = [0, 2, 4, 7, 9, 12];
 var octave = 6;
 var osc;
+
+var highestPointX;
+var highestPointY = 0;
+
+var starPower = 0;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -37,23 +44,33 @@ function setup() {
     	islands[i].create();
     }
 
+    // Moon 
+    moon = new Moon(width*2/3, height/3, 30);
+    moon.create();
+
+    sorcerer = new Person();
+
     // Font setup
     titleFont = "Georgia";
     //titleFont = loadFont("assets/fonts/ArimaMadurai-Regular.ttf");
 
     // Triangle oscillator
-    osc = new p5.TriOsc();
-    osc.start();
-    osc.amp(0);
+    //osc = new p5.TriOsc();
+    //osc.start();
+    //osc.amp(0);
 }
 
 function draw() {
     background(0,40);
-    //drawThreshold();
+
     for (var i=0; i<numIslands; i++) {
     	islands[i].display();
     }
     drawWater();
+    sorcerer.display();
+    fill(255,255);
+    strokeWeight(3);
+    ellipse(highestPointX, highestPointY, 30, 30);
     /* State handling
 	State 0 - Welcome screen
 	State 1 - Playing game
@@ -62,10 +79,10 @@ function draw() {
 	*/
 	if (state == 0) {
 		introScreen();
-		handleParticles();
 	} else if (state == 1) {
 		runGame();
 		handleParticles();
+		if (frameCounter % 15 === 0) starPower++;
 	} else if (state == 2) {
 		paused();
 	} else if (state == 3) {
@@ -74,6 +91,7 @@ function draw() {
 
 	frameCounter++;
 	//drawMoon();
+	//moon.display();
 }
 
 function playNote(note, duration) {
@@ -113,7 +131,7 @@ function Island(radius) {
 	this.verticesY = [];
 	this.jitter = radius/2;
 	this.radius = radius;
-	this.centerX = random(width);
+	this.centerX = width/4 + random(width/2);
 	this.centerY = height;
 	this.colors = [];
 
@@ -125,6 +143,12 @@ function Island(radius) {
 			var y = this.centerY + this.radius*sin(startAngle+radians) + random(-this.jitter, this.jitter);
 			this.verticesX[i] = x;
 			this.verticesY[i] = y;
+
+			// Record highest point to place person there
+			if (y > highestPointY) {
+				highestPointX = x;
+				highestPointY = y;
+			}
 
 			colorMode(HSB,100);
 			this.colors[i] = color(random(3,10), random(50,90), random(20,60), 30); 
@@ -152,19 +176,75 @@ function Island(radius) {
 	}
 }
 
-function drawMoon() {
+function Person() {
+	this.x = highestPointX;
+	this.y = highestPointY;
+
+	this.display = function() {
+		fill(255);
+		ellipse(this.x, this.y, 50, 50);
+	}
+}
+
+function Moon(xpos, ypos, radius) {
+	this.numVertices = 20;
+	this.verticesX = [];
+	this.verticesY = [];
+	this.jitter = radius/20;
+	this.radius = radius;
+	this.centerX = xpos;
+	this.centerY = ypos;
+	this.colors = [];
+
+	this.create = function() {
+		var startAngle = random(TWO_PI);
+		for (var i=0; i<this.numVertices; i++) {
+			var radians = i*TWO_PI / float(this.numVertices);
+			var x = this.centerX + this.radius*cos(startAngle+radians) + random(-this.jitter, this.jitter);
+			var y = this.centerY + this.radius*sin(startAngle+radians) + random(-this.jitter, this.jitter);
+			this.verticesX[i] = x;
+			this.verticesY[i] = y;
+
+			colorMode(HSB,100);
+			this.colors[i] = color(random(8,11), random(20,50), random(20,100), 80); 
+			colorMode(RGB,255);
+		}
+	}
+
+	this.display = function() {
+		//noFill();
+		beginShape();
+		for (var i=0; i<this.numVertices; i++) {
+			vertex(this.verticesX[i],this.verticesY[i]);
+
+			fill(this.colors[i]);
+			var x1 = this.verticesX[i];
+			var y1 = this.verticesY[i];
+			var x2 = this.verticesX[(i+3)%this.numVertices];
+			var y2 = this.verticesY[(i+3)%this.numVertices];
+			var x3 = this.verticesX[(i+6)%this.numVertices];
+			var y3 = this.verticesY[(i+6)%this.numVertices];
+			triangle(x1,y1,x2,y2,x3,y3);
+
+		}
+		endShape(CLOSE);
+		noStroke();
+	}
+}
+
+function drawSun(xpos, ypos, radius) {
 	colorMode(HSB,100);
-	c = color(random(15,25), 30, random(80,100)); 
+	c = color(random(10,20), 50, random(80,100)); 
 	stroke(c);
 	colorMode(RGB,255);
 	strokeWeight(1);
 	noFill();
 
-	var jitter = 10;
-	var vertices = 10;
-	var radius = 50;
-	var centerX = width*2/3;
-	var centerY = height/3;
+	var jitter = radius*2;
+	var vertices = radius;
+	var radius = radius;
+	var centerX = xpos;
+	var centerY = ypos;
 	beginShape();
 	var startAngle = random(TWO_PI);
 	for (var i=0; i<vertices; i++) {
@@ -220,10 +300,10 @@ function displayScore() {
 	scoreBrightness = constrain(scoreBrightness-1, 230, 255);
 	fill(scoreBrightness,100);
 
-	textAlign(CENTER);
+	textAlign(LEFT);
 	textSize(scoreBrightness*100/255);
 	textFont("Arial");
-	text(score, width/2, height/2);
+	text(score, 40, height/2);
 }
 
 function paused() {
@@ -270,14 +350,37 @@ function introScreen() {
 
 function drawCursor() {
 	noCursor(); // In-built function to hide cursor
-	fill(100,255,255);
+	// Draw cursor tail
+	colorMode(HSB,100);
+	fill(12, 30, 100);
     strokeWeight(2);
-    stroke(100,255,255);
+    stroke(12, 30, 100);
+	colorMode(RGB,255);
     line(mouseX, mouseY, prevMouseX, prevMouseY);
-    noStroke();
-    ellipse(mouseX, mouseY, catchSize/4, catchSize/4);
+    
+    // Draw starpower radius
+    colorMode(HSB,100);
+    noFill();
+    strokeWeight(1);
+    stroke(0, 0, 100, 10);
+	colorMode(RGB,255);
+    //ellipse(mouseX, mouseY, (catchSize+starPower)*5, (catchSize+starPower)*5);
+    
+    // Draw sun
+    drawSun(mouseX, mouseY, catchSize);
+	
+	catchSize = constrain(catchSize-5, 5, 500);
+    
     prevMouseX = mouseX;
     prevMouseY = mouseY;
+}
+
+function mouseClicked() {
+	ellipse(mouseX, mouseY, 5, 5);
+	catchSize = catchSize + starPower;
+	starPower = 0;
+	// prevent default
+	return false;
 }
 
 function Particle(index) {
@@ -287,7 +390,7 @@ function Particle(index) {
 	this.diameter = random(2, 10);
 	
 	colorMode(HSB,100);
-	this.c = color(random(50,60), 50, random(80,100)); //random(200,255), random(150,200), random(0,50));
+	this.c = color(random(50,60), 50, random(80,100)); 
 	colorMode(RGB,255);
 
 	this.children = [];
@@ -325,14 +428,14 @@ function Particle(index) {
 	}
 
 	this.checkMouse = function() {
-		if (abs(this.y-mouseY)<catchSize && abs(this.x-mouseX)<catchSize) {
+		if (abs(this.y-mouseY)<catchSize*4 && abs(this.x-mouseX)<catchSize*4) {
 			this.explode();
 			this.hasChildren = true;
 		} 
 	}
 
 	this.explode = function() {
-		note = 12*octave + pentatonicScale[int(random(0,pentatonicScale.length))];
+		//note = 12*octave + pentatonicScale[int(random(0,pentatonicScale.length))];
 		//playNote(note, 300);
 		//console.log("A FireChild is born!");
 		for (var i=0; i<this.numChildren; i++) {
