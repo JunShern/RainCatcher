@@ -354,9 +354,9 @@ function paused() {
 	}
 	drawTitle();
 	fill(255);
-	textSize(16);
+	textSize(26);
 	textFont(titleFont);
-	text("Game paused.\nTap / Press ENTER to resume.", width/2, height/2+50);
+	text("Game paused.\nTap / Press ENTER to resume.", width/2, height/2+100);
 	if (keyIsDown(ENTER) === true) {
 		state = 1;
 	}
@@ -374,16 +374,16 @@ function drawTitle() {
 	cursor(); // In-built function to show standard cursor
 	fill(255);
 	textAlign(CENTER);
-	textSize(56);
+	textSize(100);
 	textFont(titleFont);
 	text("RainCatcher", width/2, height/2);
 }
 
 function introScreen() {
 	drawTitle();
-	textSize(16);
+	textSize(26);
 	textFont(titleFont);
-	text("Use the cursor to catch raindrops.\nTap / Press ENTER to begin.", width/2, height/2+50);
+	text("Use the cursor to catch raindrops.\nTap / Press ENTER to begin.", width/2, height/2+100);
 	if (keyIsDown(ENTER) === true) {
 		state = 1;
 	}
