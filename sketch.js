@@ -51,8 +51,8 @@ function setup() {
     sorcerer = new Person();
 
     // Font setup
-    titleFont = "Georgia";
-    //titleFont = loadFont("assets/fonts/ArimaMadurai-Regular.ttf");
+    //titleFont = "Georgia";
+    titleFont = loadFont("assets/fonts/ArimaMadurai-Regular.ttf");
 
     // Triangle oscillator
     //osc = new p5.TriOsc();
@@ -118,7 +118,7 @@ function gameOver() {
 	cursor(); // In-built function to show standard cursor
 	displayScore();
 	textSize(16);
-	textFont("Verdana");
+	textFont(titleFont);
 	text("Game over!\nRefresh page to play again.", width/2, height/2+50);
 	if (keyIsDown(ENTER) === true) {
 		state = 1;
@@ -302,7 +302,7 @@ function displayScore() {
 
 	textAlign(LEFT);
 	textSize(scoreBrightness*100/255);
-	textFont("Arial");
+	textFont(titleFont);
 	text(score, 40, height/2);
 }
 
@@ -312,9 +312,10 @@ function paused() {
 	for (var i=0; i<numParticles; i++) {
 		particles[i].display();
 	}
+	drawTitle();
 	fill(255);
 	textSize(16);
-	textFont("Verdana");
+	textFont(titleFont);
 	text("Game paused.\nPress ENTER to resume.", width/2, height/2+50);
 	if (keyIsDown(ENTER) === true) {
 		state = 1;
@@ -341,7 +342,7 @@ function drawTitle() {
 function introScreen() {
 	drawTitle();
 	textSize(16);
-	textFont("Verdana");
+	textFont(titleFont);
 	text("Use the cursor to catch raindrops.\nPress ENTER to begin.", width/2, height/2+50);
 	if (keyIsDown(ENTER) === true) {
 		state = 1;
