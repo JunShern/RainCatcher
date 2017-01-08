@@ -451,6 +451,9 @@ function mouseClicked() {
 		if (state === 2) state = 1;
 		else if (state === 1) state = 2;
 	}
+
+	// Prevent default browser behaviour like scrolling and zooming
+	return false;
 }
 
 function touchStarted() {
@@ -463,6 +466,9 @@ function touchStarted() {
 		if (state === 2) state = 1;
 		else if (state === 1) state = 2;
 	}
+
+	// Prevent default browser behaviour like scrolling and zooming
+	return false;
 }
 
 function Particle(index) {
