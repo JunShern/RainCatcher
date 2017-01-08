@@ -10,4 +10,4 @@ You are but a sorcerer, and They are Gods. It appears that despite your best eff
 
 *Or is it?*
 
-![RainCatcher screenshot](assets/img/screenshot.png 'RainCatcher screenshot')
+![RainCatcher screenshot](https://raw.githubusercontent.com/JunShern/RainCatcher/master/assets/img/screenshot.png 'RainCatcher screenshot')
