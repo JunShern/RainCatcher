@@ -399,9 +399,9 @@ function drawCursor() {
     line(mouseX, mouseY, pmouseX, pmouseY);
     colorMode(HSB,100);
     strokeWeight(2);
-    stroke(10, 80, 100);
+    stroke(20, 50, 100);
 	colorMode(RGB,255);
-	var j = 5;
+	var j = 10;
     line(mouseX+random(-j,j), mouseY+random(-j,j), pmouseX+random(-j,j), pmouseY+random(-j,j));
     
     // Draw starpower radius
