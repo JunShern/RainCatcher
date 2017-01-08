@@ -2,8 +2,6 @@
 var particles = []; 
 var numParticles = 50;
 var catchSize = 5;
-var prevMouseX;
-var prevMouseY;
 var state = 0;
 
 var islands = [];
@@ -29,8 +27,6 @@ var starPower = 0;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
-    prevMouseX = width/2;
-    prevMouseY = height/2;
 
     for (var i=0; i<numParticles; i++) {
     	particles.push(new Particle(i));
@@ -357,7 +353,7 @@ function drawCursor() {
     strokeWeight(2);
     stroke(12, 30, 100);
 	colorMode(RGB,255);
-    line(mouseX, mouseY, prevMouseX, prevMouseY);
+    line(mouseX, mouseY, pmouseX, pmouseY);
     
     // Draw starpower radius
     colorMode(HSB,100);
@@ -371,9 +367,29 @@ function drawCursor() {
     drawSun(mouseX, mouseY, catchSize);
 	
 	catchSize = constrain(catchSize-5, 5, 500);
+}
+
+function touchMoved() {
+	// Draw cursor tail
+	colorMode(HSB,100);
+	fill(12, 30, 100);
+    strokeWeight(2);
+    stroke(12, 30, 100);
+	colorMode(RGB,255);
+    line(mouseX, mouseY, pmouseX, pmouseY);
     
-    prevMouseX = mouseX;
-    prevMouseY = mouseY;
+    // Draw starpower radius
+    colorMode(HSB,100);
+    noFill();
+    strokeWeight(1);
+    stroke(0, 0, 100, 10);
+	colorMode(RGB,255);
+    //ellipse(mouseX, mouseY, (catchSize+starPower)*5, (catchSize+starPower)*5);
+    
+    // Draw sun
+    drawSun(mouseX, mouseY, catchSize);
+	
+	catchSize = constrain(catchSize-5, 5, 500);	
 }
 
 function mouseClicked() {
@@ -383,6 +399,15 @@ function mouseClicked() {
 	starPower = 0;
 	// prevent default
 	return false;
+}
+
+function touchStarted() {
+	state = 1;
+	ellipse(mouseX, mouseY, 5, 5);
+	catchSize = catchSize + starPower;
+	starPower = 0;
+	// prevent default
+	return false;	
 }
 
 function Particle(index) {
