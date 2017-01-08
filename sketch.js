@@ -111,7 +111,7 @@ function Button(xpos, ypos, w, h) {
 		fill(this.c);
 		noStroke();
 
-		if (icon === 2) { // Pause icon
+		if (icon === 1) { // Pause icon
 			rect(this.x, this.y, this.w/3, this.h);
 			rect(this.x+2*this.w/3, this.y, this.w/3, this.h);
 		} else { // Play icon
