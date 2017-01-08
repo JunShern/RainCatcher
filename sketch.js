@@ -308,7 +308,7 @@ function drawWater() {
 		// Draw water level	
 		colorMode(HSB,100);
 		strokeWeight(1);
-		stroke(50 + lineOsc*10 - frameOsc*10, 70, 80, 50); //random(200,255), random(150,200), random(0,50));
+		stroke(55 + lineOsc*5 - frameOsc*5, 70, 80, 50); //random(200,255), random(150,200), random(0,50));
 		colorMode(RGB,255);
 		var numJoints = random(5,20);
 		for (var j=0; j<numJoints; j++) {
@@ -399,7 +399,7 @@ function drawCursor() {
     line(mouseX, mouseY, pmouseX, pmouseY);
     colorMode(HSB,100);
     strokeWeight(2);
-    stroke(5, 80, 100);
+    stroke(10, 80, 100);
 	colorMode(RGB,255);
 	var j = 5;
     line(mouseX+random(-j,j), mouseY+random(-j,j), pmouseX+random(-j,j), pmouseY+random(-j,j));
@@ -504,7 +504,7 @@ function Particle(index) {
 		if (random(100)>90) {
 			this.diameter = this.diameter-1;
 			if (state === 1) {
-				waterLevel = waterLevel+0.1;
+				waterLevel = waterLevel+0.2;
 				if (waterLevel > waterThreshold) {
 					state = 3;
 				}
@@ -541,6 +541,7 @@ function Particle(index) {
 		var noMoreChildren = true;
 		for (var i=0; i<this.numChildren; i++) {
 			if (this.children[i].y < height+this.children[i].diameter/2) {
+			//if (this.children[i].y > 0) {
 				noMoreChildren = false;
 			}
 		}
@@ -561,21 +562,23 @@ function Particle(index) {
 function FireChild(index, xpos, ypos) {
 	this.x = xpos;
 	this.y = ypos;
-	this.velX = random(-5,5);
-	this.velY = random(0,-5);
+	this.velX = random(-8,8);
+	this.velY = random(-5,5);
 	this.diameter = random(1,2);
 	this.c = 255; //random(200,255), random(150,200), random(0,50));
 
 	this.display = function() {
-		fill(this.c);
-		ellipse(this.x, this.y, this.diameter, this.diameter);
+		if (random(100) > 50) {
+			fill(this.c);
+			ellipse(this.x, this.y, this.diameter, this.diameter);
+		}
 	}
 
 	this.move = function() {
 		this.x = this.x + this.velX;
 		this.y = this.y + this.velY;
 		this.x = this.x - (this.x/abs(this.x));
-		this.velY = this.velY + 1;
+		this.velY = this.velY + 2;
 	}
 
 }
