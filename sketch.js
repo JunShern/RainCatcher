@@ -55,6 +55,11 @@ function setup() {
     //osc.start();
     //osc.amp(0);
 
+    // Play/Pause button
+    var buttonW = 45;
+    var buttonH = 50;
+    var padding = 30;
+    button = new Button(width-buttonW-padding, padding, buttonW, buttonH);
     frameRate(20);
 }
 
@@ -87,9 +92,46 @@ function draw() {
 		gameOver();
 	} 
 
+	button.display(state);
+	button.checkMouse();
+
 	frameCounter++;
 	//drawMoon();
 	//moon.display();
+}
+
+function Button(xpos, ypos, w, h) {
+	this.x = xpos;
+	this.y = ypos;
+	this.w = w;
+	this.h = h;
+	this.c = 200;
+
+	this.display = function(icon) {
+		fill(this.c);
+		noStroke();
+
+		if (icon === 2) { // Pause icon
+			rect(this.x, this.y, this.w/3, this.h);
+			rect(this.x+2*this.w/3, this.y, this.w/3, this.h);
+		} else { // Play icon
+			var x1 = this.x;
+			var y1 = this.y;
+			var x2 = this.x;
+			var y2 = this.y+h;
+			var x3 = this.x+w;
+			var y3 = this.y+h/2;
+			triangle(x1,y1,x2,y2,x3,y3);
+		}
+	}
+
+	this.checkMouse = function() {
+		if (mouseX>=this.x && mouseX <= this.x+w && mouseY>=this.y && mouseY<=this.y+h) {
+			this.c = 255;
+		} else {
+			this.c = 200;
+		}
+	}
 }
 
 function playNote(note, duration) {
@@ -239,7 +281,7 @@ function drawSun(xpos, ypos, radius) {
 	noFill();
 
 	var jitter = radius*2;
-	var vertices = radius;
+	var vertices = radius/2;
 	var radius = radius;
 	var centerX = xpos;
 	var centerY = ypos;
@@ -351,11 +393,16 @@ function drawCursor() {
 	noCursor(); // In-built function to hide cursor
 	// Draw cursor tail
 	colorMode(HSB,100);
-	fill(12, 30, 100);
     strokeWeight(2);
     stroke(12, 30, 100);
 	colorMode(RGB,255);
     line(mouseX, mouseY, pmouseX, pmouseY);
+    colorMode(HSB,100);
+    strokeWeight(2);
+    stroke(5, 80, 100);
+	colorMode(RGB,255);
+	var j = 5;
+    line(mouseX+random(-j,j), mouseY+random(-j,j), pmouseX+random(-j,j), pmouseY+random(-j,j));
     
     // Draw starpower radius
     colorMode(HSB,100);
@@ -399,6 +446,12 @@ function mouseClicked() {
 	//ellipse(mouseX, mouseY, 5, 5);
 	catchSize = catchSize + starPower;
 	starPower = 0;
+
+	if (mouseX>=button.x && mouseX <= button.x+w && mouseY>=button.y && mouseY<=button.y+h) {
+		if (state === 2) state = 1;
+		else if (state === 1) state = 2;
+	}
+
 	// prevent default
 	return false;
 }
@@ -408,6 +461,12 @@ function touchStarted() {
 	//ellipse(mouseX, mouseY, 5, 5);
 	catchSize = catchSize + starPower;
 	starPower = 0;
+
+	if (mouseX>=button.x && mouseX <= button.x+w && mouseY>=button.y && mouseY<=button.y+h) {
+		if (state === 2) state = 1;
+		else if (state === 1) state = 2;
+	}
+
 	// prevent default
 	return false;	
 }
@@ -416,10 +475,11 @@ function Particle(index) {
 	this.x = random(width);
 	this.y = random(2*height)-2*height;
 	this.index = index;
-	this.diameter = random(2, 10);
+	this.diameter = random(2, 5);
+	this.jitter = 1;
 	
 	colorMode(HSB,100);
-	this.c = color(random(50,60), 50, random(80,100)); 
+	this.c = color(random(50,60), random(0,70), random(80,100)); 
 	colorMode(RGB,255);
 
 	this.children = [];
@@ -428,7 +488,7 @@ function Particle(index) {
 
 	this.display = function() {
 		fill(this.c);
-		ellipse(this.x, this.y, this.diameter, this.diameter);
+		ellipse(this.x+random(-this.jitter,this.jitter), this.y+random(-this.jitter,this.jitter), this.diameter, this.diameter);
 	}
 
 	this.fall = function() {
