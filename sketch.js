@@ -20,10 +20,10 @@ var pentatonicScale = [0, 2, 4, 7, 9, 12];
 var octave = 6;
 var osc;
 
-var highestPointX;
-var highestPointY = 0;
-
 var starPower = 0;
+
+var sorcerer;
+var sorcererPos = 0;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -47,13 +47,7 @@ function setup() {
     sorcerer = new Person();
 
     // Font setup
-    //titleFont = "Georgia";
     titleFont = loadFont("assets/fonts/ArimaMadurai-Regular.ttf");
-
-    // Triangle oscillator
-    //osc = new p5.TriOsc();
-    //osc.start();
-    //osc.amp(0);
 
     // Play/Pause button
     var buttonW = 45;
@@ -70,10 +64,12 @@ function draw() {
     	islands[i].display();
     }
     drawWater();
-    sorcerer.display();
+	sorcerer.display(islands[sorcererPos].highestPointX, islands[sorcererPos].highestPointY);
+	sorcerer.islandHop();
+
     fill(255,255);
     strokeWeight(3);
-    ellipse(highestPointX, highestPointY, 30, 30);
+    // ellipse(highestPointX, highestPointY, 30, 30);
     /* State handling
 	State 0 - Welcome screen
 	State 1 - Playing game
@@ -98,6 +94,54 @@ function draw() {
 	frameCounter++;
 	//drawMoon();
 	//moon.display();
+}
+
+function Person() {
+	this.x = width/2;
+	this.y = height/2;
+
+	this.display = function(x_, y_) {
+		this.x += (x_ - this.x)/2;
+		this.y += (y_ - this.y)/2;
+		var heightOsc = 10 * cos(frameCounter*TWO_PI/40.0);
+		var headRadius = 10;
+		var facing = 1;
+		if (mouseX - this.X > 0) {
+			facing = -1;
+		} 
+		// Body
+		fill(70,90,170);
+		var x1 = this.x - headRadius/2;
+		var y1 = this.y - 30 + heightOsc;
+		var x2 = this.x + headRadius/2;
+		var y2 = this.y - 30 + heightOsc;
+		var x3 = this.x;
+		var y3 = this.y - 60 + heightOsc;
+		triangle(x1,y1,x2,y2,x3,y3);
+		// Head
+		fill(150,100,100);
+		ellipse(this.x, this.y-50+heightOsc, headRadius, headRadius);
+		// Sorcerer's Hat
+		fill(50,70,150);
+		var x1_ = this.x + facing * (headRadius/2 + 3);
+		var y1_ = this.y + heightOsc - 51;
+		var x2_ = this.x - facing * (headRadius/2 + 1);
+		var y2_ = this.y + heightOsc - 53;
+		var x3_ = this.x - facing * 5;
+		var y3_ = this.y + heightOsc - 70;
+		triangle(x1_,y1_,x2_,y2_,x3_,y3_);
+		// Hand
+		fill(150,100,100);
+		var handX = this.x + facing * (headRadius*2/3);
+		var handY = this.y + heightOsc - headRadius * 4;
+		ellipse(handX, handY, headRadius/2, headRadius/2);
+	};
+
+	this.islandHop = function() {
+		if (random() > 0.99) {
+			sorcererPos = int(random(numIslands));
+		}
+	};
 }
 
 function Button(xpos, ypos, w, h) {
@@ -134,19 +178,6 @@ function Button(xpos, ypos, w, h) {
 	}
 }
 
-function playNote(note, duration) {
-  osc.freq(midiToFreq(note));
-  // Fade it in
-  osc.fade(0.5,0.2);
-
-  // If we sest a duration, fade it out
-  if (duration) {
-    setTimeout(function() {
-      osc.fade(0,0.2);
-    }, duration-50);
-  }
-}
-
 function drawThreshold() {
 	stroke(200,100,30);
 	strokeWeight(2);
@@ -175,6 +206,8 @@ function Island(radius) {
 	this.centerX = width/4 + random(width/2);
 	this.centerY = height;
 	this.colors = [];
+	this.highestPointX = 0;
+	this.highestPointY = height;
 
 	this.create = function() {
 		var startAngle = random(TWO_PI);
@@ -186,9 +219,9 @@ function Island(radius) {
 			this.verticesY[i] = y;
 
 			// Record highest point to place person there
-			if (y > highestPointY) {
-				highestPointX = x;
-				highestPointY = y;
+			if (y < this.highestPointY) {
+				this.highestPointX = x;
+				this.highestPointY = y;
 			}
 
 			colorMode(HSB,100);
@@ -214,16 +247,6 @@ function Island(radius) {
 		}
 		endShape(CLOSE);
 		noStroke();
-	}
-}
-
-function Person() {
-	this.x = highestPointX;
-	this.y = highestPointY;
-
-	this.display = function() {
-		fill(255);
-		ellipse(this.x, this.y, 50, 50);
 	}
 }
 
