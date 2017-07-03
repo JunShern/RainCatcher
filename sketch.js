@@ -106,7 +106,7 @@ function Person() {
 		var heightOsc = 10 * cos(frameCounter*TWO_PI/40.0);
 		var headRadius = 10;
 		var facing = 1;
-		if (mouseX - this.X > 0) {
+		if (mouseX - this.x < 0) {
 			facing = -1;
 		} 
 		// Body
